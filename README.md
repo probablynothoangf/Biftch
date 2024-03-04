@@ -9,11 +9,11 @@ Documentation coming soon :)
 so, stay tuned :)
 
 ## Installation
-### Method 1: Manually
+### Method 1: Manually (the only way apparently :) )
 
 Make sure you have `python3` installed (>= 3.11)
 
-Clone the repository using `git`
+Clone the repository (e.g using `git clone https://github.com/probablynothoangf/Biftch.git`)
 
 Go to `Biftch/biftch-git`, and place the file `/bin/biftch` to `$HOME/bin/biftch` (create it if it doesn't exist)
 
