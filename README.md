@@ -1,7 +1,9 @@
 # biftch
 Display your system information with style :)
 
-## Notice
+Pretty customizable, using only Python 3!
+
+## !!!Notice!!!
 v0.9.2
 
 Documentation coming soon :)
