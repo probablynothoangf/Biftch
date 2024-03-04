@@ -1,0 +1,294 @@
+#!/usr/bin/env python3
+### BIFTCH, made by probablynothoangf (https://github.com/probablynothoangf)
+# the goal is to make a fetch that is modular (ig so?) with easy to make layouts :)
+
+import os
+import re
+import pathlib
+import subprocess
+import importlib
+import importlib.util
+import argparse
+
+### ANSI COLORS FIX
+### implemented from ansicolors (pip install ansicolors) and https://stackoverflow.com/q/14693701/802365#14693789
+
+def strip_color(line):
+    ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', line)
+
+def ansilen(line):
+    return len(strip_color(line))
+
+### GET TERMINAL RESOLUTION
+
+def getres():
+    return list(map(int,subprocess.getoutput("stty size").split())) #getting the current terminal resolution, and turn them into int
+
+### OBJECT SIZE FIX
+### get image rendered to a fixed (rectangular) size, with alignments
+
+def fixsize(lines,align='left'):
+    m = 0
+    v = []
+    for i in lines:
+        m = max(m,ansilen(i))
+    if align=='left':
+        for i in lines:
+            v.append(i + " "*abs(m-ansilen(i)))
+    elif align == 'right':
+        for i in lines:
+            v.append(" "*abs(m-ansilen(i)) + i)
+    elif align == 'center':
+        for i in lines:
+            k = (m-ansilen(i))//2
+            v.append(" "*k + i + " "*k)
+        v = fixsize(v)
+    return v
+
+def lenfixsize(lines):
+    k = fixsize(lines)
+    return ansilen(k[0])
+
+### ALIGNMENT FUNCTIONS
+
+def ctr(string,diff = 0):
+    re = getres()[1] - diff
+    k = f"{'|'+strip_color(string): ^{re}}" # the | indicate where to stop 
+    cn = 0 # count the space needed to center
+    for i in k:
+        if i != " ":
+            break
+        cn += 1
+    return " " * cn + string + " "*cn
+
+def lft(string):
+    k = f"{'|'+strip_color(string): <{getres()[1]}}" # the | indicate where to stop 
+    cn = 0 # count the space needed to center
+    for i in k:
+        if i != " ":
+            break
+        cn += 1
+    return " " * cn + string
+
+def rgt(string,diff=0):
+    re = getres()[1] - diff
+    k = f"{'|'+strip_color(string): >{re}}" # the | indicate where to stop 
+    cn = 0 # count the space needed to center
+    for i in k:
+        if i != " ":
+            break
+        cn += 1
+    return " " * cn + string
+
+
+def aln(string,aln,diff=0):
+    if aln == 'left':   return (string)
+    if aln == 'right':  return rgt(string,diff)
+    if aln == 'center': return ctr(string,diff)
+
+
+### COLOR FUNCTIONS
+
+def col(string,rgb):
+    return f"\033[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m"+string+"\033[0m"
+
+def getcol(rgb):
+    return f"\033[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m"
+
+def bld(string):
+    return "\033[1m" + string + "\033[0m"
+
+def itl(string):
+    return "\033[3m" + string + "\033[0m"
+
+
+
+### RENDERING ART/LAYOUT
+
+def rend(path):
+    lines = []
+    fi = open(path,"r")
+
+    filines = fi.read().split("\n")[:-1] #turn the file into list of lines
+
+    for i in filines:
+        cn = 0 # gon count braces
+        m = 0 # marker
+        i = str(i).replace(chr(92),"{chr(92)}") # replacing the damn \ char
+        v = eval("f" + repr(i)) # render colors and backslash
+        lines.append(v)
+    return (lines)
+
+
+### PRINTING FINAL RESULTS
+
+def verprint(file1, file2, align1, align2, spaces):
+    for i in rend(file1):
+        print(aln(i,align1))
+    
+    if -200 <= spaces <= 200:
+        print("\n"*abs(spaces))
+
+    for i in rend(file2):
+        print(aln(i,align2))
+
+
+def horprint(file1, file2, align1, align2, spaces):
+    lines1 = rend(file1)
+    lines2 = rend(file2)
+    mlen = max(len(lines1),len(lines2))
+    
+    while len(lines1) != mlen:
+        lines1.append(" "*lenfixsize(lines1))
+    while len(lines2) != mlen:
+        lines2.append(" "*lenfixsize(lines2))
+    
+    lines = [fixsize(lines1,align1),fixsize(lines2,align2)]
+    
+    if spaces > 200 or spaces < 0:
+        xres = getres()[1] - lenfixsize(lines1) - lenfixsize(lines2)
+    else:
+        xres = spaces
+    
+    for i in zip(*lines):
+        print(i[0] + " "*xres + i[1])
+
+### SAVE CONFIG PATH AFTER CONFIGURATION
+def saveconf(path):
+    f = open(os.path.expanduser("~") + "/bin/biftch/configpath","w")
+    f.write(path)
+    f.close()
+
+def getperm(path):
+    os.system('chmod -R a+rwX '+path)
+
+def displayver():
+    print("biftch v0.9.2")
+    exit(0)
+
+### MAIN FUNCTION
+
+if __name__ == '__main__':
+    
+    os.chdir('/')
+
+    homedir = os.path.expanduser("~")
+    
+    parser = argparse.ArgumentParser(description=f"A simple fetcher with {col('style',[0,255,255])} ;)",epilog="If this is your first time running, please go refer to my github or run with -mc path/to/config to set config folder, have fun! :)")
+    
+    parser.add_argument('-mc','--makeconfigpath', nargs=1 ,action='store',metavar='PATH',help="Set the default config folder (e.g $HOME/.config), or make the configuration directory if it doesn't exist")
+    
+    parser.add_argument('-v','--version',action='store_true',help="Display biftch's version and then exit")
+    #parser.print_help()
+    
+    args = parser.parse_args()
+    #print(args.configpath)
+    if args.makeconfigpath != None:
+        if len(args.makeconfigpath) == 1:
+            print("Changing the startup config file...")
+            saveconf(args.makeconfigpath[0])
+            getperm(homedir + '/bin/biftch/configpath')
+            
+            if subprocess.getoutput("stat -c %G " + args.makeconfigpath[0]) == 'root':
+                getperm(args.makeconfigpath[0])
+            
+            pathlib.Path(args.makeconfigpath[0] + '/biftch').mkdir(parents=True, exist_ok=True)
+            getperm(args.makeconfigpath[0] + '/biftch')
+            pathlib.Path(args.makeconfigpath[0] + '/biftch/modules').mkdir(parents=True, exist_ok=True)
+            getperm(args.makeconfigpath[0] + '/biftch/modules')
+            print(f"Done! Now you can copy config files to {args.makeconfigpath[0]}.")
+            exit(0)
+
+    if args.version == True:
+        displayver()
+    
+    if not os.path.exists(homedir + '/bin/biftch/configpath'):
+        print("Please save your config path using biftch -mc /path/to/.config")
+        exit(1)
+
+    confpathfile = open(homedir + '/bin/biftch/configpath','r')
+    maindir = str(confpathfile.readline().strip('\n'))
+    confpathfile.close()
+
+    #print()
+
+    configdir = maindir + '/biftch/config.py' # may change later so that this one is customizable
+    modpath = maindir + '/biftch/modules/'
+    if not os.path.exists(configdir):
+        print(f"Config file {configdir} does not exist!")
+        exit(1)
+    
+    configfile = importlib.util.spec_from_file_location('config',configdir)
+    conf = importlib.util.module_from_spec(configfile)
+    configfile.loader.exec_module(conf)
+
+    ### COLOR PALETTE
+
+    c0 = getcol(conf.c0)
+    c1 = getcol(conf.c1)
+    c2 = getcol(conf.c2)
+    c3 = getcol(conf.c3)
+    c4 = getcol(conf.c4)
+    c5 = getcol(conf.c5)
+    c6 = getcol(conf.c6)
+    c7 = getcol(conf.c7)
+    c8 = getcol(conf.c8)
+    c9 = getcol(conf.c9)
+    cA = getcol(conf.cA)
+    cB = getcol(conf.cB)
+    cC = getcol(conf.cC)
+    cD = getcol(conf.cD)
+    cE = getcol(conf.cE)
+    cF = getcol(conf.cF)
+
+    cr = "\033[0m" # reset color
+
+    ### LOAD MODULES
+
+    loadlist = conf.loadlist
+    extrlist = []
+
+    for i in loadlist:
+        extrlist.append(i[0])
+
+    modules = {}
+    arg = {}
+
+    for i in loadlist:
+        try:
+            lm = importlib.util.spec_from_file_location(i[0], modpath + i[0] + '.py')
+            modules[i[0]] = importlib.util.module_from_spec(lm)
+            lm.loader.exec_module(modules[i[0]]) #modules[i[0]] = importlib.import_module('modules.' + i[0])
+            arg[i[0]] = i[1]
+            #print "Successfully imported ", x, '.'
+        except ImportError:
+            print(f"Failed to import {i}, please check the modules folder")
+
+    mdl = {}
+    for i in extrlist:
+        if arg[i] != '':
+            mdl[i] = modules[i].main(arg[i])
+        else:
+            mdl[i] = modules[i].main()
+
+
+    artpath = homedir + conf.artpath
+    layoutpath = homedir + conf.layoutpath
+
+    aalign = conf.aalign
+    talign = conf.talign
+
+    spaces = conf.spaces
+
+    if conf.renderart == 'top':
+        verprint(artpath,layoutpath,aalign,talign,spaces)
+
+    if conf.renderart == 'bottom':
+        verprint(layoutpath,artpath,talign,aalign,spaces)
+
+    if conf.renderart == 'left':
+        horprint(artpath,layoutpath,aalign,talign,spaces)
+
+    if conf.renderart == 'right':
+        horprint(layoutpath,artpath,talign,aalign,spaces)
