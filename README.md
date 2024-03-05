@@ -10,22 +10,31 @@ Documentation coming soon :)
 
 so, stay tuned :)
 
+## Features
+
+* Creating beautiful system information in a matter of seconds
+
+* Pretty much customizable
+
 ## Installation
-### Method 1: Manually (the only way apparently :) )
 
-Make sure you have `python3` installed (>= 3.11)
+### Method 1: Installation script (comming soon)
 
-Clone the repository (e.g using `git clone https://github.com/probablynothoangf/Biftch.git`)
+### Method 2: Manually (the only way apparently :) )
 
-Go to `Biftch/biftch-git`, and place the file `/bin/biftch` to `$HOME/bin/biftch` (create it if it doesn't exist)
+* Make sure you have `python3` installed (>= 3.11)
 
-Now run `sudo ln -s $HOME/bin/biftch/biftch /usr/local/bin`
+* Clone the repository (e.g using `git clone https://github.com/probablynothoangf/Biftch.git`)
+
+* Go to `Biftch/biftch-git`, and place the file `/bin/biftch` to `$HOME/bin/biftch` (create it if it doesn't exist)
+
+* Now run `sudo ln -s $HOME/bin/biftch/biftch /usr/local/bin`
 
 The program should work now (try `biftch --help` or `biftch --version`).
 
-To make the program actually work (like displaying things), run `biftch --makeconfigpath /path/to/config_folder/` (e.g `biftch --makeconfigpath /home/probablynothoangf/.config`), this is required because the program needs to know where to load the config file
+* To make the program actually work (like displaying things), run `biftch --makeconfigpath /path/to/config_folder/` (e.g `biftch --makeconfigpath /home/probablynothoangf/.config`), this is required because the program needs to know where to load the config file
 
-Now find the configs file (I stored the default config in `Biftch/biftch-bin/config`) and copy all of it's contents into the config folder you've just use in `--makeconfigpath`
+* Now find the configs file (I stored the default config in `Biftch/biftch-bin/config`) and copy all of it's contents into the config folder you've just use in `--makeconfigpath`
 
 Example file structure after the installation
 
