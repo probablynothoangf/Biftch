@@ -12,9 +12,11 @@ so, stay tuned :)
 
 ## Features
 
-* Creating beautiful system information in a matter of seconds
+* Creating beautiful system information in a matter of seconds!
 
-* Pretty much customizable
+* Pretty much customizable!
+
+* Modular: you can display any kind of (single line) information on biftch!
 
 ## Installation
 
