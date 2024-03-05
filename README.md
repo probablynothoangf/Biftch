@@ -31,8 +31,8 @@ This program is clearly used for flexing (because i use arch btw).
 > [!IMPORTANT]
 > Be sure to have `python3` (>= 3.11) installed (check the version with`python3 --version`)
 
-* Method 1: Installation script(coming soon)
-* Method 2: Manually
+* **Method 1: Installation script(coming soon)**
+* **Method 2: Manually**
   + Clone the repository (e.g using `git clone https://github.com/probablynothoangf/Biftch.git`)
   + Go to `Biftch/biftch-git`, and place the file `/bin/biftch` to `$HOME/bin/biftch` (create it if it doesn't exist)
   + Now run `sudo ln -s $HOME/bin/biftch/biftch /usr/local/bin` (check if it is installed by either `biftch --help` or `biftch --version`)
