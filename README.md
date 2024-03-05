@@ -28,7 +28,7 @@ This program is clearly used for flexing (because i use arch btw).
 
 **Installation**
 
-> [!CAUTION]
+> [!IMPORTANT]
 > Be sure to have `python3` (>= 3.11) installed (check the version with`python3 --version`)
 
 * Method 1: Installation script(coming soon)
