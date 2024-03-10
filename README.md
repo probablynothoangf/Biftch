@@ -8,6 +8,9 @@
 <img align="right" width=400 src="https://github.com/probablynothoangf/Biftch/blob/main/screenshot1.png">
 
 > [!WARNING]
+> This program code is still messy and unoptimized, I'm gonna update it (and make a version for Windows because the program executes shell commands inside the code therefore it isn't compatible for Windows) when I have time. :)
+
+> [!WARNING]
 > There aren't any documentations yet about this program, so stay tuned! :)
 
 `biftch` is a mininalistic, pretty customizable command-line fetcher, using only `python3`! (>= 3.11)
